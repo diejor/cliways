@@ -3,25 +3,29 @@
 #define GAME_LIFE_HPP
 
 #include <list>
-#include <unordered_set>
 
+#include "Gen.hpp"
 #include "Loc.hpp"
+
 
 using namespace std;
 
-using Generation = unordered_set<Loc, LocHash>;
-
 namespace game_life {
+    int const REMEMBERED_GENS = 100;
 
     class GameLife {
         private:
-            list<Generation> history;
+            Gen history[REMEMBERED_GENS];
+            int current_gen;
             int generations_per_second;
 
         public:
             GameLife();
 
-            GameLife(Generation initial_state, int generations_per_second = 1);
+            GameLife(Gen initial_state, int generations_per_second = 1);
+
+            void add_gen(Gen const& gen);
+            Gen get_current_gen() const;
 
             void run();
     };

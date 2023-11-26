@@ -14,13 +14,15 @@ class Grid {
     private:
         vector<vector<T>> grid;
     public:
-        Grid(int length);
+        Grid(int size);
+        Grid(int height, int width);
 
         bool in_bounds(Loc loc) const;
     
         T& operator[](Loc loc);
         
-        int length() const;
+        int height() const;
+        int width() const;
 };
 
 

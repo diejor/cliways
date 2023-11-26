@@ -3,11 +3,14 @@ add_executable(app
     game_life.cpp
 )
 
+find_package(Curses REQUIRED)
+
 # include directories here
 target_link_libraries(app PRIVATE
     utils
     automata
     math
+    ${CURSES_LIBRARIES}
 )
 
 install(TARGETS app)

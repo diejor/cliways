@@ -4,28 +4,28 @@
 
 using namespace std;
 
-Loc::Loc(): x(0), y(0) {}
+Loc::Loc(): row(0), col(0) {}
 
-Loc::Loc(int x, int y): x(x), y(y) {}
+Loc::Loc(int r, int c): row(r), col(c) {}
 
-int Loc::col() const {
-    return this->x;
+int Loc::get_row() const {
+    return this->row;
 }
 
-int Loc::row() const {
-    return this->y;
+int Loc::get_col() const {
+    return this->col;
 }
 
 Loc Loc::operator+(const Loc& other) const {
-    return Loc(this->x + other.x, this->y + other.y);
+    return Loc(this->row + other.get_row(), this->col + other.get_col());
 }
 
 Loc Loc::operator-(const Loc& other) const {
-    return Loc(this->x - other.x, this->y - other.y);
+    return Loc(this->row- other.get_row(), this->col- other.get_col());
 }
 
 bool Loc::operator==(const Loc& other) const {
-    return this->x == other.x && this->y == other.y;
+    return this->row == other.get_row() && this->col == other.get_col();
 }
 
 vector<Loc> Loc::neighbors() const {
@@ -35,18 +35,18 @@ vector<Loc> Loc::neighbors() const {
     // 4 X 5
     // 6 7 8
     
-    neighbors.push_back(Loc(this->x - 1, this->y - 1));
-    neighbors.push_back(Loc(this->x, this->y - 1));
-    neighbors.push_back(Loc(this->x + 1, this->y - 1));
-    neighbors.push_back(Loc(this->x - 1, this->y));
-    neighbors.push_back(Loc(this->x + 1, this->y));
-    neighbors.push_back(Loc(this->x - 1, this->y + 1));
-    neighbors.push_back(Loc(this->x, this->y + 1));
-    neighbors.push_back(Loc(this->x + 1, this->y + 1));
+    neighbors.push_back(Loc(this->row - 1, this->col - 1));
+    neighbors.push_back(Loc(this->row - 1, this->col));
+    neighbors.push_back(Loc(this->row - 1, this->col + 1));
+    neighbors.push_back(Loc(this->row, this->col - 1));
+    neighbors.push_back(Loc(this->row, this->col + 1));
+    neighbors.push_back(Loc(this->row + 1, this->col - 1));
+    neighbors.push_back(Loc(this->row + 1, this->col));
+    neighbors.push_back(Loc(this->row + 1, this->col + 1));
     
     return neighbors;
 }
 
 size_t LocHash::operator()(const Loc& loc) const {
-    return (hash<int>()(loc.row()) * 7) ^ hash<int>()(loc.col());
+    return (hash<int>()(loc.get_row()) * 7) ^ hash<int>()(loc.get_col());
 }

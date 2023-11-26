@@ -8,14 +8,14 @@ using namespace std;
 
 class Loc {
     private:
-        const int x;
-        const int y;
+        int row;
+        int col;
     public:
         Loc();
-        Loc(int x, int y);
+        Loc(int row, int col);
 
-        int row() const;
-        int col() const;
+        int get_row() const;
+        int get_col() const;
 
         bool operator==(const Loc& other) const;
         Loc operator+(const Loc& other) const;
