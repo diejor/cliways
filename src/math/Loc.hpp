@@ -21,6 +21,8 @@ class Loc {
         Loc operator+(const Loc& other) const;
         Loc operator-(const Loc& other) const;
 
+        Loc& operator+=(const Loc& other);
+
         vector<Loc> neighbors() const;
 };
 

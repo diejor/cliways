@@ -40,13 +40,14 @@ namespace global {
     namespace debug_flags {
         const bool stop_flow = false;
 
-        // experiments
-        const bool EXPERIMENT_BEFORE = false;
-        const bool EXPERIMENT_AFTER = false;
-
         // user input
         const bool TRIM_WHITESPACE = false;
         const bool USER_INPUT = false;
+
+        // parser
+        const bool EMPTY_FILE = true;
+        const bool IGNORING_COMMENT = false;
+        const bool TOKEN_LINE = false;
 
         // grid
         const bool MIDDLE_POINT = false;

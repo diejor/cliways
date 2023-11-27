@@ -1,11 +1,10 @@
-#include <chrono>
 #include <ostream>
-#include <thread>
-#include <cstdlib>
 
+#include <curses.h>
 #include <ncurses.h>
 
 #include "Cell.hpp"
+#include "Controller.hpp"
 #include "game_life.hpp"
 
 #include "Grid.hpp"
@@ -16,37 +15,10 @@
 using namespace std;
 
 namespace game_life {
-    Grid<Cell> simple_view(Gen state, int height, int width, Loc start_loc) {
-        Grid<Cell> view(height, width);
-        
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                Loc loc(row, col);
 
-                if (state.is_alive(loc + start_loc)) {
-                    Cell cell(loc, true);
-                    view[loc] = cell;
-                }
-            }
-        }
-
-        return view;
-    }
-
-    void print_view(Grid<Cell> view) {
-        for (int row = 0; row < view.height(); row++) {
-            for (int col = 0; col < view.width(); col++) {
-                Loc index(row, col);
-                cout << (view[index].alive ? "O " : ". ");
-            }
-            cout << endl;
-        }
-    }
-
-    GameLife::GameLife(Gen initial_state, int generations_per_second) {
-        this->current_gen = 0;
-        this->history[current_gen] = initial_state;
-        this->generations_per_second = generations_per_second;
+    GameLife::GameLife(Gen initial_state, int height, int width) :
+        controls(Controller(height, width)) {
+        add_gen(initial_state);
     }
 
     void GameLife::add_gen(Gen const& gen) {
@@ -54,86 +26,53 @@ namespace game_life {
         history[current_gen] = gen;
     }
 
-    void capture_mouse(vector<Loc>& mouse_clicks) {
-        MEVENT event;
-        if (getmouse(&event) == OK) {
-            if (event.bstate & BUTTON1_CLICKED) {
-                int cell_x = event.x / 2;  // Adjust according to your cell size
-                int cell_y = event.y;
-                mouse_clicks.push_back(Loc(cell_y, cell_x));
+    void GameLife::print_view(ostream& out, View view) {
+        Gen current_gen = history[this->current_gen];
+        for (int row = 0; row < view.height; row++) {
+            for (int col = 0; col < view.width; col++) { 
+                Loc loc(row, col);
+                if (current_gen.is_alive(loc + view.start_loc)) {
+                    out << "o ";
+                } else {
+                    out << ". ";
+                }
             }
+            out << endl;
         }
     }
 
-    void GameLife::run() {
-        initscr();             // Start ncurses mode
-        cbreak();              // Line buffering disabled
-        noecho();              // Don't echo while we do getch
-        keypad(stdscr, TRUE);  // Get function keys
-        nodelay(stdscr, TRUE); // Non-blocking getch
-        curs_set(0);           // Hide the cursor
-        
-        // Enable mouse events
-        mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
-        printf("\033[?1003h\n"); // For xterm-compatible terminals
-        
-        Loc start_loc(0, 0);
-        bool paused = false;
-        int scale = 0;
-        vector<Loc> mouse_clicks;
-        
-        while (true) {
-            int ch;
-            while ((ch = getch()) != ERR) {  // Process all available input
-                switch (ch) {
-                    case KEY_UP:
-                        start_loc = start_loc + Loc(-1, 0);
-                        break;
-                    case KEY_DOWN:
-                        start_loc = start_loc + Loc(1, 0);
-                        break;
-                    case KEY_LEFT:
-                        start_loc = start_loc + Loc(0, -1);
-                        break;
-                    case KEY_RIGHT:
-                        start_loc = start_loc + Loc(0, 1);
-                        break;
-                    case ' ':
-                        paused = !paused;
-                        break;
-                    case '+':
-                        scale += 5;
-                        cout << "scale: " << scale << endl;
-                        break;
-                    case '-':
-                        if (scale > 0)
-                            scale -= 5;
-                        break;
-                    case KEY_MOUSE:
-                        capture_mouse(mouse_clicks);
-                        break;
-                }
-            }
+    void GameLife::run(ostream& out) {
+        controls.init_ncurses();
 
-            system("clear");
+        while (!controls.exit) {
+
+            controls.handle_input();
             
-            if (!paused) {
+            if (!controls.paused) { 
                 Gen next_gen = history[current_gen].next_gen();
                 add_gen(next_gen);
             }
 
-            while (!mouse_clicks.empty()) {
-                Loc click = mouse_clicks.back();
-                mouse_clicks.pop_back();
-                Loc loc = click + start_loc;
-                history[current_gen].toggle(loc);
-            }
+            controls.toggle_clicks(history[current_gen]);
 
-            Grid<Cell> view = simple_view(history[current_gen], 10+scale, 20+scale, start_loc);
-            print_view(view);
+            system("clear");
 
+            print_view(cout, controls.view);
+            cout << "Generations per second: " << controls.generations_per_second << 
+                " | " << (controls.paused ? "PAUSED" : "Running") << endl;
+            cout << endl;
+            cout << "\t Controls: " << endl;
+            cout << "\t: arrows to move view" << endl;
+            cout << "\t: 'u' to speed up" << endl;
+            cout << "\t: 'd' to slow down" << endl;
+            cout << "\t: 'space' to pause" << endl;
+            cout << "\t: '=' to expand view" << endl;
+            cout << "\t: '-' to reduce view" << endl;
+            cout << "\t: mouse click to toggle cell" << endl;
+            cout << "\t: 'q' to quit" << endl;
+            
 
-            this_thread::sleep_for(chrono::milliseconds(1000 / generations_per_second));
+            controls.wait();
         }
     }
 

@@ -1,6 +1,7 @@
 add_library(automata
     Gen.cpp
     Cell.cpp
+    pattern.cpp
 )
 
 target_link_libraries(automata PRIVATE

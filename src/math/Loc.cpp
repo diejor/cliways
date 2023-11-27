@@ -28,6 +28,12 @@ bool Loc::operator==(const Loc& other) const {
     return this->row == other.get_row() && this->col == other.get_col();
 }
 
+Loc& Loc::operator+=(const Loc& other) {
+    this->row += other.get_row();
+    this->col += other.get_col();
+    return *this;
+}
+
 vector<Loc> Loc::neighbors() const {
     vector<Loc> neighbors;
     // 8 neighbors

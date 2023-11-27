@@ -1,0 +1,12 @@
+# Billiard Pattern
+#
+# Or you can try to create "billiard table configurations".
+# These are mostly stable, with just a few cells blinking
+# or bouncing around inside.
+# Here's an example of a billiard pattern:
+
+**....**
+*.*..*.*
+..*..*..
+..*..*..
+...**...

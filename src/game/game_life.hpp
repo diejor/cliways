@@ -3,9 +3,14 @@
 #define GAME_LIFE_HPP
 
 #include <list>
+#include <ostream>
 
+#include "Controller.hpp"
 #include "Gen.hpp"
 #include "Loc.hpp"
+
+#include "Grid.hpp"
+#include "Cell.hpp"
 
 
 using namespace std;
@@ -17,17 +22,16 @@ namespace game_life {
         private:
             Gen history[REMEMBERED_GENS];
             int current_gen;
-            int generations_per_second;
+            Controller controls;
 
         public:
-            GameLife();
-
-            GameLife(Gen initial_state, int generations_per_second = 1);
+            GameLife(Gen initial_state, int height = 20, int width = 20);
 
             void add_gen(Gen const& gen);
             Gen get_current_gen() const;
+            void print_view(ostream& out, View view);
 
-            void run();
+            void run(ostream& out);
     };
 }
 

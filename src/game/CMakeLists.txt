@@ -1,6 +1,7 @@
 add_executable(app
     main.cpp
     game_life.cpp
+    Controller.cpp
 )
 
 find_package(Curses REQUIRED)
